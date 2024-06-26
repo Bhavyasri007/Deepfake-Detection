@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .upload-form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .upload-btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .upload-btn:hover {
+            background-color: #45a049;
+        }
+        .result-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .result-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+        .result-text {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .real {
+            color: #4CAF50;
+        }
+        .fake {
+            color: #FF5722;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Deepfake Detection</h1>
+        <div class="upload-form">
+            <form id="upload-form" enctype="multipart/form-data">
+                <input type="file" name="file" id="file-input">
+                <button class="upload-btn" type="button" onclick="uploadImage()">Upload Image</button>
+            </form>
+        </div>
+        <div class="result-container" id="result-container" style="display: none;">
+            <img src="" alt="Result" class="result-image" id="result-image">
+            <p class="result-text" id="result-text"></p>
+        </div>
+    </div>
+
+    <script>
+        function uploadImage() {
+            var fileInput = document.getElementById("file-input");
+            var formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            fetch("/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(prediction => displayResult(prediction))
+            .catch(error => console.error("Error:", error));
+        }
+
+        function displayResult(prediction) {
+            var resultContainer = document.getElementById("result-container");
+            var resultImage = document.getElementById("result-image");
+            var resultText = document.getElementById("result-text");
+
+            // Show the result container
+            resultContainer.style.display = "block";
+
+            // Update result text
+            if (prediction.prediction === 0) {
+                resultText.textContent = "Deepfake Image";
+                resultText.className = "result-text fake";
+            } else {
+                resultText.textContent = "Real Image";
+                resultText.className = "result-text real";
+            }
+        }
+    </script>
+</body>
+</html>
